@@ -56,8 +56,8 @@ const login = async (req, res, next) =>{
 
     try {
         const user = req.body;
-        await userService.login(user);
-        return res.sendStatus(200);// Convert 200 to ok && set status to 200
+        const {token} = await userService.login(user);
+        return res.json({token});// Convert 200 to ok && set status to 200
     }catch(e){
         next(e);
     }

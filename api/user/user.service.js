@@ -5,15 +5,14 @@ const jwt = require('jsonwebtoken')
 const config = require('../../config');
 const add = async (user) => {
     try {
-        if (validation(user)) {
-            const {password: plainTextPassword} = user;
-            user.password = await bcrypt.hash(plainTextPassword, 10)
+        const {password: plainTextPassword} = user;
+        user.password = await bcrypt.hash(plainTextPassword, 10)
 
-            const userRecord = await UserModel.create(user);
-            console.log('user created successfully');
+        const userRecord = await UserModel.create(user);
+        console.log('user created successfully');
 
-            return userRecord;
-        }
+        return userRecord;
+
     } catch (e) {
         if (e.code === 11000) {
             throw new Error("Email already in use");
@@ -81,7 +80,7 @@ const login = async (user) => {
             config.auth.jwtSecret
         )
         console.log('user login successfully', token)
-        return true;
+        return {token};
     }
     throw new Error('invalid email or password');
 }
