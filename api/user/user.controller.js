@@ -11,15 +11,16 @@ const add = async (req, res, next) => {
     }
 }
 
-// const update = async (req, res, next) => {
-//     try {
-//         const user = req.body;
-//         const result = await userService.update(user);
-//         return res.status(200).json(result);
-//     }catch(e){
-//         next(e);
-//     }
-// }
+
+const update = async (req, res, next) => {
+    try {
+        const user = req.body;
+        const result = await userService.update(user);
+        return res.status(200).json(result);
+    }catch(e){
+        next(e);
+    }
+}
 
 const deleteById = async (req, res, next) => {
     try {
@@ -73,12 +74,15 @@ const changePassword = async(req, res, next) => {
     }
 }
 
+
+
 module.exports = {
     add,
-    //update,
+    update,
     deleteById,
     getById,
     getAll,
     login,
     changePassword
+
 }

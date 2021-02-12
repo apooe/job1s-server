@@ -3,6 +3,8 @@ const UserModel = require('./user.model');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
+
+
 const add = async (user) => {
     try {
         const {password: plainTextPassword} = user;
@@ -21,15 +23,16 @@ const add = async (user) => {
     }
 }
 
-// const update = async (user) => {
-//     try{
-//         const newUser =  await UserModel.findOneAndUpdate({_id:user._id}, user, {new:true});
-//         return newUser;
-//
-//     }catch(e){
-//         throw new Error('Unable to update an user');
-//     }
-// }
+
+const update = async (user) => {
+    try{
+        const newUser =  await UserModel.findOneAndUpdate({_id:user._id}, user, {new:true});
+        return newUser;
+
+    }catch(e){
+        throw new Error('Unable to update an user');
+    }
+}
 
 const deleteById = async (id) => {
     try {
@@ -65,19 +68,20 @@ const login = async (user) => {
 
     const {email, password} = user
 
-    const u = await UserModel.findOne({email}).lean()
+    const userRecord = await UserModel.findOne({email}).lean();
 
-    if (!u) {
+    if (!userRecord) {
         throw new Error('invalid email or password');
     }
 
-    if (await bcrypt.compare(password, u.password)) {
+    if (await bcrypt.compare(password, userRecord.password)) {
 
         const token = jwt.sign({
-                id: u._id,
-                email: u.email
+                ...userRecord,
+            password: undefined
             },
-            config.auth.jwtSecret
+            config.auth.jwtSecret,
+            {expiresIn: '24h'}
         )
         console.log('user login successfully', token)
         return {token};
@@ -114,52 +118,55 @@ const changePassword = async (user) => {
 }
 
 
-const validation = (user) => {
-    const {email, firstname, lastname, password: plainTextPassword, confirmPassword: confirmPassword} = user;
 
-
-    if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || !email) {
-        throw new Error('email not valid');
-    }
-
-    const error = checkPassword(plainTextPassword, confirmPassword);
-    console.log(error);
-    if (error.e) {
-        throw new Error(error.message);
-    }
-
-    if (!(/^[a-zA-Z\s]+$/.test(firstname)) && !(/^[a-zA-Z\s]+$/.test(lastname))) {
-        throw new Error("Your firstname and your lastname are not valid.");
-    } else if (!(/^[a-zA-Z\s]+$/.test(firstname)) || !firstname) {
-        throw new Error("Your firstname is not valid.");
-    } else if (!(/^[a-zA-Z\s]+$/.test(lastname)) || !lastname) {
-        throw new Error("Your lastname is not valid.");
-    }
-    return true;
-}
-
-const checkPassword = (password, confirmPassword) => {
-
-    if (password.length < 2) {
-        return {
-            e: true,
-            message: "Password too small. Should be at least 8 characters."
-        };
-    } else if (password !== confirmPassword) {
-        return {
-            e: true,
-            message: "You need to enter the same password."
-        };
-    }
-    return false;
-}
+// const validation = (user) => {
+//     const {email, firstname, lastname, password: plainTextPassword, confirmPassword: confirmPassword} = user;
+//
+//
+//     if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || !email) {
+//         throw new Error('email not valid');
+//     }
+//
+//     const error = checkPassword(plainTextPassword, confirmPassword);
+//     console.log(error);
+//     if (error.e) {
+//         throw new Error(error.message);
+//     }
+//
+//     if (!(/^[a-zA-Z\s]+$/.test(firstname)) && !(/^[a-zA-Z\s]+$/.test(lastname))) {
+//         throw new Error("Your firstname and your lastname are not valid.");
+//     } else if (!(/^[a-zA-Z\s]+$/.test(firstname)) || !firstname) {
+//         throw new Error("Your firstname is not valid.");
+//     } else if (!(/^[a-zA-Z\s]+$/.test(lastname)) || !lastname) {
+//         throw new Error("Your lastname is not valid.");
+//     }
+//     return true;
+// }
+//
+// const checkPassword = (password, confirmPassword) => {
+//
+//     if (password.length < 2) {
+//         return {
+//             e: true,
+//             message: "Password too small. Should be at least 8 characters."
+//         };
+//     } else if (password !== confirmPassword) {
+//         return {
+//             e: true,
+//             message: "You need to enter the same password."
+//         };
+//     }
+//     return false;
+// }
 
 module.exports = {
     add,
-    //update,
+    update,
     deleteById,
     getById,
     getAll,
     login,
-    changePassword
+    changePassword,
+
+
 }
