@@ -4,6 +4,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
 
+const nodemailer = require("nodemailer");
+const smtpTransport = require('nodemailer-smtp-transport');
+
 
 const add = async (user) => {
     try {
@@ -25,11 +28,11 @@ const add = async (user) => {
 
 
 const update = async (user) => {
-    try{
-        const newUser =  await UserModel.findOneAndUpdate({_id:user._id}, user, {new:true});
+    try {
+        const newUser = await UserModel.findOneAndUpdate({_id: user._id}, user, {new: true});
         return newUser;
 
-    }catch(e){
+    } catch (e) {
         throw new Error('Unable to update an user');
     }
 }
@@ -78,7 +81,7 @@ const login = async (user) => {
 
         const token = jwt.sign({
                 ...userRecord,
-            password: undefined
+                password: undefined
             },
             config.auth.jwtSecret,
             {expiresIn: '24h'}
@@ -117,47 +120,41 @@ const changePassword = async (user) => {
     }
 }
 
+const sendFormToUser = async (form) => {
+
+    console.log("je suis dans le service : ", form)
+
+    const transporter = nodemailer.createTransport(smtpTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+            user: 'jobonesecond@gmail.com',
+            pass: 'job1second2021'
+        }
+    }));
+
+    const mailOptions = {
+        from: 'jobonesecond@gmail.com',
+        to: 'laurie.freva@hotmail.fr',
+        subject: 'You received a message',
+        html: `<p><strong>from:</strong> ${form.firstname} ${form.lastname}</p>
+                <p><strong>Email: </strong> ${form.email}</p>
+                <p><strong>Phone:</strong> ${form.phone}</p>
+                <p><strong>Message:</strong> ${form.message}</p>
+                <p><strong>emailDest:</strong> ${form.emailDest}</p>\`,`,
+    };
+
+    await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 
 
-// const validation = (user) => {
-//     const {email, firstname, lastname, password: plainTextPassword, confirmPassword: confirmPassword} = user;
-//
-//
-//     if (!(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) || !email) {
-//         throw new Error('email not valid');
-//     }
-//
-//     const error = checkPassword(plainTextPassword, confirmPassword);
-//     console.log(error);
-//     if (error.e) {
-//         throw new Error(error.message);
-//     }
-//
-//     if (!(/^[a-zA-Z\s]+$/.test(firstname)) && !(/^[a-zA-Z\s]+$/.test(lastname))) {
-//         throw new Error("Your firstname and your lastname are not valid.");
-//     } else if (!(/^[a-zA-Z\s]+$/.test(firstname)) || !firstname) {
-//         throw new Error("Your firstname is not valid.");
-//     } else if (!(/^[a-zA-Z\s]+$/.test(lastname)) || !lastname) {
-//         throw new Error("Your lastname is not valid.");
-//     }
-//     return true;
-// }
-//
-// const checkPassword = (password, confirmPassword) => {
-//
-//     if (password.length < 2) {
-//         return {
-//             e: true,
-//             message: "Password too small. Should be at least 8 characters."
-//         };
-//     } else if (password !== confirmPassword) {
-//         return {
-//             e: true,
-//             message: "You need to enter the same password."
-//         };
-//     }
-//     return false;
-// }
+}
+
 
 module.exports = {
     add,
@@ -167,6 +164,7 @@ module.exports = {
     getAll,
     login,
     changePassword,
+    sendFormToUser
 
 
 }

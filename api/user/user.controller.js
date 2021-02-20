@@ -1,6 +1,7 @@
 const userService = require('./user.service');
 
 
+
 const add = async (req, res, next) => {
     try {
         const user = req.body;
@@ -74,7 +75,19 @@ const changePassword = async(req, res, next) => {
     }
 }
 
+const sendFormToUser = async(req, res, next) => {
 
+    try {
+        const form = req.body;
+        console.log("in the controller", form);
+        await userService.sendFormToUser(form);
+        return res.sendStatus(200);
+    }catch(e){
+        next(e);
+    }
+
+
+}
 
 module.exports = {
     add,
@@ -83,6 +96,7 @@ module.exports = {
     getById,
     getAll,
     login,
-    changePassword
+    changePassword,
+    sendFormToUser
 
 }

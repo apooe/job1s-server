@@ -3,6 +3,9 @@ const userController = require('./user.controller');
 const {validate} = require('../../lib/helpers/middlewares');
 const userValidator = require('./user.validator');
 const {isAuth} = require('./user.middlewares');
+
+
+
 const initUserRoutes = (globalRouter) => {
 
     //create a new router
@@ -23,6 +26,8 @@ const initUserRoutes = (globalRouter) => {
     userRouter.post('/home', isAuth, (req, res) => {
         console.log(req.token);
     })
+
+    userRouter.post('/sendFormToUser', userController.sendFormToUser);
 }
 
 module.exports = {initUserRoutes};
