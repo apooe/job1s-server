@@ -1,5 +1,5 @@
 const UserModel = require('./user.model');
-const RecruiterModel = require('./user.model');
+const RecruiterModel = require('../recruiter/recruiter.model');
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -9,6 +9,8 @@ const nodemailer = require("nodemailer");
 const smtpTransport = require('nodemailer-smtp-transport');
 
 
+const AUTH_TYPE_RECRUITER = 'recruiter';
+const AUTH_TYPE_JOB_SEEKER = 'job_seeker';
 const add = async (user) => {
     try {
         const {password: plainTextPassword} = user;
@@ -62,7 +64,10 @@ const getById = async (id) => {
 const getAll = async (query = {}) => {
     try {
         const users = await UserModel.find(query); // The {} is reprensenting all (without filter)
-        return users;
+        return users.map(user => {
+            user.password = undefined;
+            return user;
+        });
     } catch (e) {
         throw new Error('Unable to get all users.');
     }
@@ -70,19 +75,25 @@ const getAll = async (query = {}) => {
 
 const login = async (user) => {
 
-    const {email, password} = user
+    const {email, password} = user;
+    let userType = AUTH_TYPE_JOB_SEEKER;
 
-    const userRecord = await UserModel.findOne({email}).lean();
+    let userRecord = await UserModel.findOne({email}).lean();
 
     if (!userRecord) {
-        throw new Error('invalid email or password');
+        userRecord = await RecruiterModel.findOne({email}).lean();
+        userType = AUTH_TYPE_RECRUITER;
+        if (!userRecord) {
+            throw new Error('invalid email or password');
+        }
     }
 
     if (await bcrypt.compare(password, userRecord.password)) {
 
         const token = jwt.sign({
                 ...userRecord,
-                password: undefined
+                password: undefined,
+                userType
             },
             config.auth.jwtSecret,
             {expiresIn: '24h'}
