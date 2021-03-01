@@ -22,7 +22,7 @@ const add = async (profil) => {
 
 const update = async (profile) => {
     try{
-        console.log("je sus ds update", profile);
+        console.log("je sus ds update profile", profile);
         const newProfile=  await ProfileModel.findOneAndUpdate({_id:profile._id}, profile, {new: true});
         return newProfile;
 
@@ -74,7 +74,6 @@ const getAll = async (query = {}) => {
 
 const uploadPicture = async (query = {}) => {
     try{
-
 
     }catch(e){
         throw new Error('Unable to get upload picture.');

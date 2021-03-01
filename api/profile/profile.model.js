@@ -12,14 +12,17 @@ const profileSchema = new mongoose.Schema({
     education:  [{collegeName: {type: String},
         degree:{type: String},
         startDate: {type: Date},
-        endDate: {type: Date}}],
+        endDate: {type: Date},
+        link:{type: String}}],
     projects: {type: Array},
     status: {type: Boolean},
     experience: [{companyName: {type: String},
                     position:{type: String},
                     startDate: {type: Date},
                     endDate: {type: Date},
-                    description:{ type: String}}]
+                    description:{ type: String},
+                    link:{type: String}}]
+
 })
 
 module.exports = mongoose.model('Profile', profileSchema);

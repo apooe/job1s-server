@@ -1,4 +1,5 @@
 const UserModel = require('./user.model');
+const RecruiterModel = require('./user.model');
 
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -135,13 +136,13 @@ const sendFormToUser = async (form) => {
 
     const mailOptions = {
         from: 'jobonesecond@gmail.com',
-        to: 'laurie.freva@hotmail.fr',
+        to: form.emailDest,
         subject: 'You received a message',
         html: `<p><strong>from:</strong> ${form.firstname} ${form.lastname}</p>
                 <p><strong>Email: </strong> ${form.email}</p>
                 <p><strong>Phone:</strong> ${form.phone}</p>
                 <p><strong>Message:</strong> ${form.message}</p>
-                <p><strong>emailDest:</strong> ${form.emailDest}</p>\`,`,
+                `,
     };
 
     await transporter.sendMail(mailOptions, function (error, info) {
