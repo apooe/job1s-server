@@ -6,6 +6,7 @@ const userValidator = Yup.object().shape({
     firstname: Yup.string().min(2).required(),
     lastname: Yup.string().min(2).required(),
     password: Yup.string().min(6).required(),
+    job: Yup.string(),
     _v: Yup.number().optional().nullable()
 });
 

@@ -26,9 +26,7 @@ const add = async (recruiter) => {
 
 const update = async (recruiter) => {
     try {
-
         const newRecruiter = await RecruiterModel.findOneAndUpdate({_id: recruiter._id}, recruiter, {new: true});
-
         return newRecruiter;
 
     } catch (e) {
@@ -68,27 +66,27 @@ const getAll = async (query = {}) => {
 
 const login = async (recruiter) => {
 
-    const {email, password} = recruiter
-
-    const recruiterRecord = await RecruiterModel.findOne({email}).lean();
-
-    if (!recruiterRecord) {
-        throw new Error('invalid email or password');
-    }
-
-    if (await bcrypt.compare(password, recruiterRecord.password)) {
-
-        const token = jwt.sign({
-                ...recruiterRecord,
-                password: undefined
-            },
-            config.auth.jwtSecret,
-            {expiresIn: '24h'}
-        )
-        console.log('recruiter login successfully', token)
-        return {token};
-    }
-    throw new Error('invalid email or password');
+    // const {email, password} = recruiter
+    //
+    // const recruiterRecord = await RecruiterModel.findOne({email}).lean();
+    //
+    // if (!recruiterRecord) {
+    //     throw new Error('invalid email or password');
+    // }
+    //
+    // if (await bcrypt.compare(password, recruiterRecord.password)) {
+    //
+    //     const token = jwt.sign({
+    //             ...recruiterRecord,
+    //             password: undefined
+    //         },
+    //         config.auth.jwtSecret,
+    //         {expiresIn: '24h'}
+    //     )
+    //     console.log('recruiter login successfully', token)
+    //     return {token};
+    // }
+    // throw new Error('invalid email or password');
 }
 
 const changePassword = async (recruiter) => {

@@ -8,12 +8,15 @@ const recruiterSchema = new mongoose.Schema({
     firstname: {type: String, required:true},
     lastname: {type: String, required:true},
     password: {type: String, required:true},
+    companyLink:{type: String},
     jobPosts: [{companyName: {type: String},
         title:{type: String},
         location: {type: String},
         employment: {type: String},
         description:{ type: String},
+        companyImg: {type: Boolean},
         url:{type:String}}]
+
 })
 
 module.exports = mongoose.model('Recruiter', recruiterSchema);

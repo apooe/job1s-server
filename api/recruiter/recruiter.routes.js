@@ -22,7 +22,7 @@ const initRecruiterRoutes = (globalRouter) => {
     recruiterRouter.post('/login', recruiterController.login);
     recruiterRouter.post('/change-password', recruiterController.changePassword);
 
-    recruiterRouter.post('/upload', recruiterController.uploadPicture)
+    recruiterRouter.post('/uploadImg', recruiterController.uploadPicture)
 
     recruiterRouter.post('/home', isAuth, (req, res) => {
         console.log(req.token);

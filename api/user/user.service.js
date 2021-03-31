@@ -1,6 +1,5 @@
 const UserModel = require('./user.model');
 const RecruiterModel = require('../recruiter/recruiter.model');
-
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
@@ -8,9 +7,9 @@ const config = require('../../config');
 const nodemailer = require("nodemailer");
 const smtpTransport = require('nodemailer-smtp-transport');
 
-
 const AUTH_TYPE_RECRUITER = 'recruiter';
 const AUTH_TYPE_JOB_SEEKER = 'job_seeker';
+
 const add = async (user) => {
     try {
         const {password: plainTextPassword} = user;
@@ -135,6 +134,10 @@ const changePassword = async (user) => {
 const sendFormToUser = async (form) => {
 
     console.log("je suis dans le service : ", form)
+    let path = form.resume;
+    let filename = path.split("/").pop();
+    console.log(filename)
+
 
     const transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
@@ -145,24 +148,65 @@ const sendFormToUser = async (form) => {
         }
     }));
 
+    let htmlContent = `<p><strong>from:</strong> ${form.firstname} ${form.lastname}</p>
+                <p><strong>Email: </strong> ${form.email}</p>
+                <p><strong>Phone:</strong> ${form.phone}</p>`;
+
+    if (form.message) {
+        htmlContent += `<p><strong>Message:</strong> ${form.message}</p>`
+    }
+
     const mailOptions = {
         from: 'jobonesecond@gmail.com',
         to: form.emailDest,
         subject: 'You received a message',
-        html: `<p><strong>from:</strong> ${form.firstname} ${form.lastname}</p>
-                <p><strong>Email: </strong> ${form.email}</p>
-                <p><strong>Phone:</strong> ${form.phone}</p>
-                <p><strong>Message:</strong> ${form.message}</p>
-                `,
+        html: htmlContent,
+        attachments: [
+            {
+                filename: filename,
+                path: `../../code/ProjectHadassah/public/uploadsResume/${filename}`
+
+            }
+        ]
+
     };
 
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log(error);
+            console.log("errrrrrrror", error);
         } else {
             console.log('Email sent: ' + info.response);
         }
     });
+}
+
+const uploadResume = async (query = {}) => {
+    try {
+    } catch (e) {
+        throw new Error('Unable to get upload resume.');
+    }
+}
+
+const searchProfiles = async (jobName) => {
+    let jobQuery = {};
+    if (jobName) {
+        const jobRegexArray = jobName.trim().split(' ').map(word => {
+            return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
+        });
+        jobQuery = {$or: jobRegexArray}
+        console.log(jobQuery);
+    }
+
+    try {
+        const users = await UserModel.find(jobQuery);
+        console.log("users", users)
+        return users.map(user => {
+            user.password = undefined;
+            return user;
+        });
+    } catch (e) {
+        throw new Error('Unable to get search users');
+    }
 
 
 }
@@ -176,7 +220,9 @@ module.exports = {
     getAll,
     login,
     changePassword,
-    sendFormToUser
+    sendFormToUser,
+    uploadResume,
+    searchProfiles
 
 
 }

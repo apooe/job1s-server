@@ -19,7 +19,7 @@ const initProfileRoutes = (globalRouter) => {
     ProfileRouter.get('/:userId', profileController.getByUserId);
     ProfileRouter.get('/:id', profileController.getById);
     ProfileRouter.get('/', profileController.getAll);
-    ProfileRouter.post('/upload', profileController.uploadPicture);
+    ProfileRouter.post('/uploadImg', profileController.uploadPicture);
 
 
 

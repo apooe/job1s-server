@@ -3,19 +3,16 @@ const mongoose = require('mongoose');
 
 // Define the Database model
 const profileSchema = new mongoose.Schema({
+
     userId: {type: mongoose.Schema.Types.ObjectId, required:true, unique: true},
     profileImg: {type: String},
-    dateOfBirth: {type: Date},
-    gender: {type: Boolean},
-    domain: {type: String},
+    job: {type: String},
     description: {type: String},
     education:  [{collegeName: {type: String},
         degree:{type: String},
         startDate: {type: Date},
         endDate: {type: Date},
         link:{type: String}}],
-    projects: {type: Array},
-    status: {type: Boolean},
     experience: [{companyName: {type: String},
                     position:{type: String},
                     startDate: {type: Date},

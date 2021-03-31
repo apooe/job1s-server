@@ -85,9 +85,31 @@ const sendFormToUser = async(req, res, next) => {
     }catch(e){
         next(e);
     }
-
-
 }
+
+const uploadResume = async (req,  res, next)=>{
+    try {
+        const {resumeFile} = req.query;
+        const resume = await userService.uploadResume(resumeFile);
+        return res.json(resume);
+    }catch(e){
+        next(e);
+    }
+}
+
+const searchProfiles = async (req, res, next)=>{
+
+    console.log(req.query)
+
+    try {
+        const {job} = req.query;
+        const resume = await userService.searchProfiles(job);
+        return res.json(resume);
+    }catch(e){
+        next(e);
+    }
+}
+
 
 module.exports = {
     add,
@@ -97,6 +119,8 @@ module.exports = {
     getAll,
     login,
     changePassword,
-    sendFormToUser
+    sendFormToUser,
+    uploadResume,
+    searchProfiles
 
 }
