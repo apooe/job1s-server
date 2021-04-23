@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
     password: {type: String, required:true},
     job: {type: String},
     phone:{type: mongoose.SchemaTypes.Phone},
+    address:{type: String},
+    websites: [{type:String}],
     city: {type: String}
 
 

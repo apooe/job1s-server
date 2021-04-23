@@ -199,7 +199,6 @@ const searchProfiles = async (jobName) => {
 
     try {
         const users = await UserModel.find(jobQuery);
-        console.log("users", users)
         return users.map(user => {
             user.password = undefined;
             return user;
@@ -207,8 +206,24 @@ const searchProfiles = async (jobName) => {
     } catch (e) {
         throw new Error('Unable to get search users');
     }
+}
+
+const findCorrespondingUsers = async (relatedJobTitles) => {
+
+    console.log(relatedJobTitles);
+
+    try {
+        const users = await UserModel.find({job :relatedJobTitles });
+        console.log(users)
+        return users.map(user => {
+            user.password = undefined;
+            return user;
+        });
 
 
+    } catch (e) {
+        throw new Error('Unable to get  profiles of users');
+    }
 }
 
 
@@ -222,7 +237,8 @@ module.exports = {
     changePassword,
     sendFormToUser,
     uploadResume,
-    searchProfiles
+    searchProfiles,
+    findCorrespondingUsers
 
 
 }

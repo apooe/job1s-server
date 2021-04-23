@@ -100,15 +100,28 @@ const uploadResume = async (req,  res, next)=>{
 const searchProfiles = async (req, res, next)=>{
 
     console.log(req.query)
-
     try {
         const {job} = req.query;
-        const resume = await userService.searchProfiles(job);
-        return res.json(resume);
+        const profiles = await userService.searchProfiles(job);
+        return res.json(profiles);
     }catch(e){
         next(e);
     }
 }
+
+const findCorrespondingUsers = async (req, res, next)=>{
+
+    console.log("body : ",req.body)
+    try {
+        const relatedJobs = req.body;
+        const profiles = await userService.findCorrespondingUsers(relatedJobs);
+        return res.json(profiles);
+    }catch(e){
+        next(e);
+    }
+}
+
+
 
 
 module.exports = {
@@ -121,6 +134,7 @@ module.exports = {
     changePassword,
     sendFormToUser,
     uploadResume,
-    searchProfiles
+    searchProfiles,
+    findCorrespondingUsers
 
 }

@@ -125,6 +125,28 @@ const uploadPicture = async (query = {}) => {
     }
 }
 
+const searchJobPosts = async (jobName) => {
+    let jobQuery = {};
+    console.log(jobName, "APOOE PAR ICI !!!")
+    const formattedJobName = jobName.trim().toLowerCase();
+    if (jobName) {
+        const jobRegex = {'jobPosts.title': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        jobQuery = jobRegex;
+    }
+
+    try {
+        const recruiters = await RecruiterModel.find(jobQuery);
+        console.log(recruiters);
+        return recruiters.map(recruiter => {
+            recruiter.password = undefined;
+            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.title.toLowerCase() === formattedJobName);
+            return recruiter;
+        });
+    } catch (e) {
+        throw new Error('Unable to get search jobpost');
+    }
+}
+
 
 module.exports = {
     add,
@@ -134,7 +156,8 @@ module.exports = {
     getAll,
     login,
     changePassword,
-    uploadPicture
+    uploadPicture,
+    searchJobPosts
 
 
 }
