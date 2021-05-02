@@ -149,8 +149,11 @@ const sendFormToUser = async (form) => {
     }));
 
     let htmlContent = `<p><strong>from:</strong> ${form.firstname} ${form.lastname}</p>
-                <p><strong>Email: </strong> ${form.email}</p>
-                <p><strong>Phone:</strong> ${form.phone}</p>`;
+                <p><strong>Email: </strong> ${form.email}</p>`;
+
+    if (form.phone) {
+        htmlContent += `<p><strong>Phone:</strong> ${form.phone}</p>`
+    }
 
     if (form.message) {
         htmlContent += `<p><strong>Message:</strong> ${form.message}</p>`
@@ -194,7 +197,6 @@ const searchProfiles = async (jobName) => {
             return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
         });
         jobQuery = {$or: jobRegexArray}
-        console.log(jobQuery);
     }
 
     try {

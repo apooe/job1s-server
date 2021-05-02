@@ -28,6 +28,7 @@ const initUserRoutes = (globalRouter) => {
         console.log(req.token);
     })
     userRouter.post('/uploadResume', userController.uploadResume);
+
     userRouter.post('/sendFormToUser', userController.sendFormToUser);
 
 

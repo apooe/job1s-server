@@ -136,14 +136,13 @@ const searchJobPosts = async (jobName) => {
 
     try {
         const recruiters = await RecruiterModel.find(jobQuery);
-        console.log(recruiters);
         return recruiters.map(recruiter => {
             recruiter.password = undefined;
-            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.title.toLowerCase() === formattedJobName);
+            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.title.toLowerCase().includes(formattedJobName));
             return recruiter;
         });
     } catch (e) {
-        throw new Error('Unable to get search jobpost');
+            throw new Error('Unable to get search `jobpost`');
     }
 }
 

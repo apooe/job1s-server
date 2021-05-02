@@ -12,7 +12,8 @@ const userSchema = new mongoose.Schema({
     phone:{type: mongoose.SchemaTypes.Phone},
     address:{type: String},
     websites: [{type:String}],
-    city: {type: String}
+    city: {type: String},
+    resume: {type: String},
 
 
 })

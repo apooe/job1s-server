@@ -87,7 +87,6 @@ const uploadPicture = async (req,  res, next)=>{
 
 const searchJobPosts = async (req, res, next)=>{
 
-    console.log(req.query)
     try {
         const {job} = req.query;
         const profiles = await recruiterService.searchJobPosts(job);

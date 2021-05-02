@@ -25,7 +25,7 @@ const fileStorageForResume = multer.diskStorage({
     },
     filename: function (req, file, cb) {
         // Set the store filename
-        const storedFileName = `resume${path.extname(file.originalname)}`;
+        const storedFileName = `resume_${Date.now() + path.extname(file.originalname)}`;;
         cb(null, storedFileName) //Appending extension
     }
 });
