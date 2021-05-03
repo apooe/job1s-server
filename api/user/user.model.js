@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-var mongooseTypePhone = require('mongoose-type-phone');
 
 // Define the Database model
 const userSchema = new mongoose.Schema({
@@ -9,7 +8,7 @@ const userSchema = new mongoose.Schema({
     lastname: {type: String, required:true},
     password: {type: String, required:true},
     job: {type: String},
-    phone:{type: mongoose.SchemaTypes.Phone},
+    phone:{type: Number},
     address:{type: String},
     websites: [{type:String}],
     city: {type: String},
