@@ -127,18 +127,20 @@ const uploadPicture = async (query = {}) => {
 
 const searchJobPosts = async (jobName) => {
     let jobQuery = {};
-    console.log(jobName, "APOOE PAR ICI !!!")
+    console.log(jobName)
     const formattedJobName = jobName.trim().toLowerCase();
-    if (jobName) {
-        const jobRegex = {'jobPosts.title': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
-        jobQuery = jobRegex;
+
+    if (jobName) { // jobPosts.title
+        const relatedRegex = {'jobPosts.relatedJobs': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const descriptionRegex = {'jobPosts.description': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        jobQuery = [relatedRegex, descriptionRegex];
     }
 
     try {
-        const recruiters = await RecruiterModel.find(jobQuery);
+        const recruiters = await RecruiterModel.find({}).or(jobQuery);
         return recruiters.map(recruiter => {
             recruiter.password = undefined;
-            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.title.toLowerCase().includes(formattedJobName));
+            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.description.toLowerCase().includes(formattedJobName) || j.relatedJobs.find( r => r.toLowerCase().includes(formattedJobName))); //j.title.toLowerCase()
             return recruiter;
         });
     } catch (e) {

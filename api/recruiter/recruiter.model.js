@@ -15,6 +15,8 @@ const recruiterSchema = new mongoose.Schema({
         employment: {type: String},
         description:{ type: String},
         companyImg: {type: Boolean},
+        relatedJobs:[{type: String}],
+        jobPostId: {type: String},
         url:{type:String}}]
 
 })
