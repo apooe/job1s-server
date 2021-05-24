@@ -3,10 +3,9 @@ const RecruiterModel = require('../recruiter/recruiter.model');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
-
+const crypto = require('crypto');
 const nodemailer = require("nodemailer");
 const smtpTransport = require('nodemailer-smtp-transport');
-
 const AUTH_TYPE_RECRUITER = 'recruiter';
 const AUTH_TYPE_JOB_SEEKER = 'job_seeker';
 
@@ -16,8 +15,6 @@ const add = async (user) => {
         user.password = await bcrypt.hash(plainTextPassword, 10)
 
         const userRecord = await UserModel.create(user);
-        console.log('user created successfully');
-
         return userRecord;
 
     } catch (e) {
@@ -97,47 +94,101 @@ const login = async (user) => {
             config.auth.jwtSecret,
             {expiresIn: '24h'}
         )
-        console.log('user login successfully', token)
         return {token};
     }
     throw new Error('invalid email or password');
 }
 
-const changePassword = async (user) => {
+const resetPassword = async (email) => {
 
-    const {token, newpassword: plainTextPassword, confirmPassword} = user
-
-    const error = checkPassword(plainTextPassword, confirmPassword);
-    if (error.e) {
-        throw new Error(error.message);
+    const user = await UserModel.findOne({email}) || await RecruiterModel.findOne({email});
+    if (!user) {
+        throw new Error("Invalid email")
     }
+    return await createCode(user);
 
-    try {
-        const u = jwt.verify(token, config.auth.jwtSecret)
-        const _id = u.id
-        const password = await bcrypt.hash(plainTextPassword, 10)
-
-        await UserModel.updateOne(
-            {_id},
-            {
-                $set: {password}
-            }
-        )
-        console.log("change password sucessfully");
-        return true;
-
-    } catch (e) {
-        throw new Error('Unable to change password.');
-    }
 }
 
+const createCode = async (user) => {
+    user.resetCode = crypto.randomBytes(4).toString("hex");
+    await user.save();
+    await sendCode(user);
+    return user._id;
+}
+
+const changePassword = async (id, body) => {
+
+    try {
+        const {newPassword, confirmPassword} = body;
+        await checkPassword(newPassword, confirmPassword);
+        const user = await getById(id) || await RecruiterModel.findOne({_id: id});
+        user.password = await bcrypt.hash(newPassword, 10);
+        return await UserModel.findOneAndUpdate({_id: id}, user, {new: true}) ||
+            await RecruiterModel.findOneAndUpdate({_id: id}, user, {new: true});
+
+    } catch (e) {
+        throw new Error(e.message);
+    }
+
+}
+const checkPassword = async (newPassword, confirmPassword) => {
+
+    if (!newPassword || !confirmPassword) {
+        throw new Error('Please complete the fields');
+    } else if (newPassword !== confirmPassword) {
+        throw new Error('Please enter the same password');
+    } else if (newPassword.length < 6) {
+        throw new Error('The password must contain at least 6 characters');
+    }
+
+}
+
+const checkCodeReset = async (code) => {
+    const user = await UserModel.findOne({resetCode: code}) || await RecruiterModel.findOne({resetCode: code});
+    if (!user) {
+        throw new Error('Invalid code provided');
+    }
+    return true;
+}
+
+const sendCode = async (user) => {
+
+    const transporter = nodemailer.createTransport(smtpTransport({
+        service: 'gmail',
+        host: 'smtp.gmail.com',
+        auth: {
+            user: 'jobonesecond@gmail.com',
+            pass: 'job1second2021'
+        }
+    }));
+
+    let htmlContent = `<h2>Hi ${user.firstname} ${user.lastname}, </h2>
+                        <p>We recently received a request to recover the account ${user.email}.</p>
+                        <p>Enter the code: <strong>${user.resetCode}</strong> to change your password.</p>
+                        <p>If you didn't request this, please ignore this email.</p>
+                        <p>Thanks, </p>
+                        <p>Team Job1second</p>`;
+    const mailOptions = {
+        from: 'jobonesecond@gmail.com',
+        to: user.email,
+        subject: 'Reset password for your account',
+        html: htmlContent,
+    };
+
+    await transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log("error", error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+
+
+}
 const sendFormToUser = async (form) => {
 
-    console.log("je suis dans le service : ", form)
     let path = form.resume;
     let filename = path.split("/").pop();
-    console.log(filename)
-
 
     const transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
@@ -176,7 +227,7 @@ const sendFormToUser = async (form) => {
 
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            console.log("errrrrrrror", error);
+            console.log("error", error);
         } else {
             console.log('Email sent: ' + info.response);
         }
@@ -212,11 +263,9 @@ const searchProfiles = async (jobName) => {
 
 const findCorrespondingUsers = async (relatedJobTitles) => {
 
-    console.log(relatedJobTitles);
 
     try {
-        const users = await UserModel.find({job :relatedJobTitles });
-        console.log(users)
+        const users = await UserModel.find({job: relatedJobTitles});
         return users.map(user => {
             user.password = undefined;
             return user;
@@ -240,7 +289,7 @@ module.exports = {
     sendFormToUser,
     uploadResume,
     searchProfiles,
-    findCorrespondingUsers
-
-
+    findCorrespondingUsers,
+    checkCodeReset,
+    resetPassword
 }

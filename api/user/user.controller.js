@@ -23,6 +23,7 @@ const update = async (req, res, next) => {
     }
 }
 
+
 const deleteById = async (req, res, next) => {
     try {
         const {id} = req.params;
@@ -43,10 +44,13 @@ const getById = async (req, res, next) => {
     }
 }
 
+
+
+
 const getAll = async (req, res, next) => {
     try {
         const {q} = req.query;
-        const query = q || {};
+        const query = req.query || q || {};
         const results = await userService.getAll(query);
         return res.status(200).json(results);
     }catch(e){
@@ -65,21 +69,44 @@ const login = async (req, res, next) =>{
     }
 }
 
+const resetPassword = async (req, res, next) => {
+    try {
+        const {email} = req.params;
+        const result = await userService.resetPassword(email);
+        return res.status(200).json(result);
+    }catch(e){
+        next(e);
+    }
+}
+
 const changePassword = async(req, res, next) => {
     try {
-        const user = req.body;
-        await userService.changePassword(user);
+        console.log("ds controller")
+        //const user = req.body;
+        const {id} = req.params;
+        const body = req.body;
+        await userService.changePassword(id, body);
         return res.sendStatus(200);// Convert 200 to ok && set status to 200
     }catch(e){
         next(e);
     }
 }
 
+const checkCodeReset = async(req, res, next) => {
+    try {
+        const {code} = req.params;
+        await userService.checkCodeReset(code.trim());
+        return res.sendStatus(200);// Convert 200 to ok && set status to 200
+    }catch(e){
+        next(e);
+    }
+}
+
+
 const sendFormToUser = async(req, res, next) => {
 
     try {
         const form = req.body;
-        console.log("in the controller", form);
         await userService.sendFormToUser(form);
         return res.sendStatus(200);
     }catch(e){
@@ -99,7 +126,6 @@ const uploadResume = async (req,  res, next)=>{
 
 const searchProfiles = async (req, res, next)=>{
 
-    console.log(req.query)
     try {
         const {job} = req.query;
         const profiles = await userService.searchProfiles(job);
@@ -111,7 +137,6 @@ const searchProfiles = async (req, res, next)=>{
 
 const findCorrespondingUsers = async (req, res, next)=>{
 
-    console.log("body : ",req.body)
     try {
         const relatedJobs = req.body;
         const profiles = await userService.findCorrespondingUsers(relatedJobs);
@@ -131,10 +156,12 @@ module.exports = {
     getById,
     getAll,
     login,
+    resetPassword,
     changePassword,
     sendFormToUser,
     uploadResume,
     searchProfiles,
+    checkCodeReset,
     findCorrespondingUsers
 
 }

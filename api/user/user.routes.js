@@ -22,8 +22,12 @@ const initUserRoutes = (globalRouter) => {
     userRouter.post('/findCorrespondingUsers', userController.findCorrespondingUsers);
     userRouter.get('/:id', userController.getById);
     userRouter.get('/', userController.getAll);
+
+    userRouter.get('/resetPassword/:email', userController.resetPassword);
+    userRouter.get('/codeVerification/:code', userController.checkCodeReset);
+    userRouter.post('/changePassword/:id', userController.changePassword);
+
     userRouter.post('/login', userController.login);
-    userRouter.post('/change-password', userController.changePassword);
     userRouter.post('/home', isAuth, (req, res) => {
         console.log(req.token);
     })

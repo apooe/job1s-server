@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     websites: [{type:String}],
     city: {type: String},
     resume: {type: String},
-
+    resetCode: String
 
 })
 

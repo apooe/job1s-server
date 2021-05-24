@@ -17,7 +17,8 @@ const recruiterSchema = new mongoose.Schema({
         companyImg: {type: Boolean},
         relatedJobs:[{type: String}],
         jobPostId: {type: String},
-        url:{type:String}}]
+        url:{type:String}}],
+    resetCode: String
 
 })
 

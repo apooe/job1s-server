@@ -133,14 +133,21 @@ const searchJobPosts = async (jobName) => {
     if (jobName) { // jobPosts.title
         const relatedRegex = {'jobPosts.relatedJobs': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
         const descriptionRegex = {'jobPosts.description': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
-        jobQuery = [relatedRegex, descriptionRegex];
+        const locationRegex = {'jobPosts.location': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const companyRegex = {'jobPosts.companyName': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+
+        jobQuery = [relatedRegex, descriptionRegex, locationRegex, companyRegex];
     }
 
     try {
         const recruiters = await RecruiterModel.find({}).or(jobQuery);
         return recruiters.map(recruiter => {
             recruiter.password = undefined;
-            recruiter.jobPosts = recruiter.jobPosts.filter(j => j.description.toLowerCase().includes(formattedJobName) || j.relatedJobs.find( r => r.toLowerCase().includes(formattedJobName))); //j.title.toLowerCase()
+            recruiter.jobPosts = recruiter.jobPosts.filter(j =>
+                j.description.toLowerCase().includes(formattedJobName) ||
+                j.location.toLowerCase().includes(formattedJobName) ||
+                j.companyName.toLowerCase().includes(formattedJobName) ||
+                j.relatedJobs.find( r => r.toLowerCase().includes(formattedJobName))); //j.title.toLowerCase()
             return recruiter;
         });
     } catch (e) {
