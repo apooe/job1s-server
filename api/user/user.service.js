@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const config = require('../../config');
 const crypto = require('crypto');
 const nodemailer = require("nodemailer");
+
 const smtpTransport = require('nodemailer-smtp-transport');
 const AUTH_TYPE_RECRUITER = 'recruiter';
 const AUTH_TYPE_JOB_SEEKER = 'job_seeker';
