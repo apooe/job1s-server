@@ -18,6 +18,11 @@ const config = {
     },
     auth: {
         jwtSecret: process.env.JWT_SECRET || 'apooe',
+    },
+    aws: {
+        id:  process.env.AWS_ID,
+        secret: process.env.AWS_SECRET,
+        bucket: process.env.AWS_UPLOAD_BUCKET_NAME
     }
 }
 
