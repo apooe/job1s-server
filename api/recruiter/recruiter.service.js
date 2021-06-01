@@ -3,7 +3,7 @@ const RecruiterModel = require('./recruiter.model');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
-
+const UserModel = require('../user/user.model');
 
 const add = async (recruiter) => {
     try {
@@ -89,34 +89,6 @@ const login = async (recruiter) => {
     // throw new Error('invalid email or password');
 }
 
-const changePassword = async (recruiter) => {
-
-    const {token, newpassword: plainTextPassword, confirmPassword} = recruiter
-
-    const error = checkPassword(plainTextPassword, confirmPassword);
-    if (error.e) {
-        throw new Error(error.message);
-    }
-
-    try {
-        const u = jwt.verify(token, config.auth.jwtSecret)
-        const _id = u.id
-        const password = await bcrypt.hash(plainTextPassword, 10)
-
-        await RecruiterModel.updateOne(
-            {_id},
-            {
-                $set: {password}
-            }
-        )
-        console.log("change password sucessfully");
-        return true;
-
-    } catch (e) {
-        throw new Error('Unable to change password.');
-    }
-}
-
 const uploadPicture = async (query = {}) => {
     try{
 
@@ -140,7 +112,7 @@ const searchJobPosts = async (jobName) => {
     }
 
     try {
-        const recruiters = await RecruiterModel.find({}).or(jobQuery);
+        const recruiters = await RecruiterModel.find({jobPosts: { $exists: true, $not: {$size: 0} }}).or(jobQuery);
         return recruiters.map(recruiter => {
             recruiter.password = undefined;
             recruiter.jobPosts = recruiter.jobPosts.filter(j =>
@@ -156,6 +128,30 @@ const searchJobPosts = async (jobName) => {
 }
 
 
+const findRelatedJobSeeker = async (recruitedId) => {
+
+    try{
+        const recruiter = await RecruiterModel.findById(recruitedId).lean();
+        // If not recruiter error svp
+        const allRelatedJobs = recruiter.jobPosts?.reduce( (acc, jobPost) => {
+            acc.push(...jobPost.relatedJobs);
+            return acc;
+        }, []);
+
+        const userRelated = await UserModel.find({job: {$in: allRelatedJobs}}).lean();
+
+        return userRelated.map(js => {
+            js.password = undefined;
+            return js;
+        });
+
+    }catch (e) {
+        throw new Error('Unable to get corresponding job Seekers');
+    }
+
+}
+
+
 module.exports = {
     add,
     update,
@@ -163,7 +159,7 @@ module.exports = {
     getById,
     getAll,
     login,
-    changePassword,
+    findRelatedJobSeeker,
     uploadPicture,
     searchJobPosts
 

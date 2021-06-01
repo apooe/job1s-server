@@ -262,8 +262,28 @@ const searchProfiles = async (jobName) => {
     }
 }
 
-const findCorrespondingUsers = async (relatedJobTitles) => {
+const jobSeekersMatch = async (jobName) => {
+    console.log(jobName)
+    let jobQuery = {};
+    if (jobName) {
+        const jobRegexArray = jobName.trim().split(' ').map(word => {
+            return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
+        });
+        jobQuery = {$or: jobRegexArray}
+    }
 
+    try {
+        const users = await UserModel.find(jobQuery);
+        return users.map(user => {
+            user.password = undefined;
+            return user;
+        });
+    } catch (e) {
+        throw new Error('Unable to get search users');
+    }
+}
+
+const findCorrespondingUsers = async (relatedJobTitles) => {
 
     try {
         const users = await UserModel.find({job: relatedJobTitles});
@@ -292,5 +312,6 @@ module.exports = {
     searchProfiles,
     findCorrespondingUsers,
     checkCodeReset,
-    resetPassword
+    resetPassword,
+    jobSeekersMatch
 }

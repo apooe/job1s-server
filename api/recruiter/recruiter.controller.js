@@ -65,15 +65,7 @@ const login = async (req, res, next) =>{
     }
 }
 
-const changePassword = async(req, res, next) => {
-    try {
-        const recruiter = req.body;
-        await recruiterService.changePassword(recruiter);
-        return res.sendStatus(200);// Convert 200 to ok && set status to 200
-    }catch(e){
-        next(e);
-    }
-}
+
 
 const uploadPicture = async (req,  res, next)=>{
     try {
@@ -96,6 +88,17 @@ const searchJobPosts = async (req, res, next)=>{
     }
 }
 
+const findRelatedJobSeeker = async (req, res, next)=>{
+
+    try {
+        const {id} = req.query;
+        const profiles = await recruiterService.findRelatedJobSeeker(id);
+        return res.json(profiles);
+    }catch(e){
+        next(e);
+    }
+}
+
 
 module.exports = {
     add,
@@ -104,7 +107,7 @@ module.exports = {
     getById,
     getAll,
     login,
-    changePassword,
+    findRelatedJobSeeker,
     uploadPicture,
     searchJobPosts
 

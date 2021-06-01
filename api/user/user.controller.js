@@ -135,6 +135,17 @@ const searchProfiles = async (req, res, next)=>{
     }
 }
 
+const jobSeekersMatch = async (req, res, next)=>{
+
+    try {
+        const {job} = req.query;
+        const profiles = await userService.jobSeekersMatch(job);
+        return res.json(profiles);
+    }catch(e){
+        next(e);
+    }
+}
+
 const findCorrespondingUsers = async (req, res, next)=>{
 
     try {
@@ -162,6 +173,7 @@ module.exports = {
     uploadResume,
     searchProfiles,
     checkCodeReset,
-    findCorrespondingUsers
+    findCorrespondingUsers,
+    jobSeekersMatch
 
 }

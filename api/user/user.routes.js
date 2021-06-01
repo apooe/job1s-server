@@ -19,10 +19,10 @@ const initUserRoutes = (globalRouter) => {
     userRouter.put('/', userController.update);
     userRouter.delete('/:id', userController.deleteById);
     userRouter.get('/search', userController.searchProfiles);
+    userRouter.get('/jobSeekersMatch', userController.jobSeekersMatch);
     userRouter.post('/findCorrespondingUsers', userController.findCorrespondingUsers);
     userRouter.get('/:id', userController.getById);
     userRouter.get('/', userController.getAll);
-
     userRouter.get('/resetPassword/:email', userController.resetPassword);
     userRouter.get('/codeVerification/:code', userController.checkCodeReset);
     userRouter.post('/changePassword/:id', userController.changePassword);
