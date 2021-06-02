@@ -1,5 +1,4 @@
 const RecruiterModel = require('./recruiter.model');
-
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
@@ -66,27 +65,6 @@ const getAll = async (query = {}) => {
 
 const login = async (recruiter) => {
 
-    // const {email, password} = recruiter
-    //
-    // const recruiterRecord = await RecruiterModel.findOne({email}).lean();
-    //
-    // if (!recruiterRecord) {
-    //     throw new Error('invalid email or password');
-    // }
-    //
-    // if (await bcrypt.compare(password, recruiterRecord.password)) {
-    //
-    //     const token = jwt.sign({
-    //             ...recruiterRecord,
-    //             password: undefined
-    //         },
-    //         config.auth.jwtSecret,
-    //         {expiresIn: '24h'}
-    //     )
-    //     console.log('recruiter login successfully', token)
-    //     return {token};
-    // }
-    // throw new Error('invalid email or password');
 }
 
 const uploadPicture = async (query = {}) => {
@@ -128,6 +106,30 @@ const searchJobPosts = async (jobName) => {
 }
 
 
+const findRelatedRecruiters = async (jobName) => {
+    let jobQuery = {};
+    console.log(jobName)
+    const formattedJobName = jobName.trim().toLowerCase();
+
+    if (jobName) { // jobPosts.title
+        const relatedRegex = {'jobPosts.relatedJobs': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const descriptionRegex = {'jobPosts.description': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+
+
+        jobQuery = [relatedRegex, descriptionRegex];
+    }
+
+    try {
+        const recruiters = await RecruiterModel.find({jobPosts: { $exists: true, $not: {$size: 0} }}).or(jobQuery);
+        return recruiters.map(recruiter => {
+            recruiter.password = undefined;
+            return recruiter;
+        });
+    } catch (e) {
+        throw new Error('Unable to get related recruiters');
+    }
+}
+
 const findRelatedJobSeeker = async (recruitedId) => {
 
     try{
@@ -148,8 +150,8 @@ const findRelatedJobSeeker = async (recruitedId) => {
     }catch (e) {
         throw new Error('Unable to get corresponding job Seekers');
     }
-
 }
+
 
 
 module.exports = {
@@ -161,7 +163,8 @@ module.exports = {
     login,
     findRelatedJobSeeker,
     uploadPicture,
-    searchJobPosts
+    searchJobPosts,
+    findRelatedRecruiters
 
 
 }

@@ -99,6 +99,17 @@ const findRelatedJobSeeker = async (req, res, next)=>{
     }
 }
 
+const findRelatedRecruiters = async (req, res, next)=>{
+
+    try {
+        const {job} = req.query;
+        const profiles = await recruiterService.findRelatedRecruiters(job);
+        return res.json(profiles);
+    }catch(e){
+        next(e);
+    }
+}
+
 
 module.exports = {
     add,
@@ -108,6 +119,7 @@ module.exports = {
     getAll,
     login,
     findRelatedJobSeeker,
+    findRelatedRecruiters,
     uploadPicture,
     searchJobPosts
 

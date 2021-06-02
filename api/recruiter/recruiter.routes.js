@@ -19,6 +19,7 @@ const initRecruiterRoutes = (globalRouter) => {
     recruiterRouter.delete('/:id', recruiterController.deleteById);
     recruiterRouter.get('/search', recruiterController.searchJobPosts);
     recruiterRouter.get('/findRelatedJobSeeker', recruiterController.findRelatedJobSeeker);
+    recruiterRouter.get('/findRelatedRecruiters', recruiterController.findRelatedRecruiters);
     recruiterRouter.get('/:id', recruiterController.getById);
     recruiterRouter.get('/', recruiterController.getAll);
     recruiterRouter.post('/login', recruiterController.login);
