@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     lastname: {type: String, required:true},
     password: {type: String, required:true},
     job: {type: String},
+    relatedJobs:[{type: String}],
     phone:{type: String},
     address:{type: String},
     websites: [{type:String}],

@@ -243,22 +243,24 @@ const uploadResume = async (query = {}) => {
 }
 
 const searchProfiles = async (jobName) => {
+
     let jobQuery = {};
     if (jobName) {
         const jobRegexArray = jobName.trim().split(' ').map(word => {
-            return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
+            return {relatedJobs: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
         });
         jobQuery = {$or: jobRegexArray}
     }
 
     try {
         const users = await UserModel.find(jobQuery);
+        console.log(users)
         return users.map(user => {
             user.password = undefined;
             return user;
         });
     } catch (e) {
-        throw new Error('Unable to get search users');
+        throw new Error('Unable to get profiles for this search');
     }
 }
 
