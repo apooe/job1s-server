@@ -244,16 +244,18 @@ const uploadResume = async (query = {}) => {
 
 const searchProfiles = async (jobName) => {
 
-    let jobQuery = {};
+    let jobQuery = [];
     if (jobName) {
-        const jobRegexArray = jobName.trim().split(' ').map(word => {
-            return {relatedJobs: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
+        const formattedJobName = jobName.trim().toLowerCase();
+        const jobRegexArray = formattedJobName.split(' ').map(word => {
+            return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
         });
-        jobQuery = {$or: jobRegexArray}
-    }
+        const locationRegex = {city: {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
 
+        jobQuery =  [...jobRegexArray, locationRegex];
+    }
     try {
-        const users = await UserModel.find(jobQuery);
+        const users = await UserModel.find({}).or(jobQuery);
         console.log(users)
         return users.map(user => {
             user.password = undefined;
@@ -265,17 +267,20 @@ const searchProfiles = async (jobName) => {
 }
 
 const jobSeekersMatch = async (jobName) => {
-    console.log(jobName)
-    let jobQuery = {};
+    let jobQuery = [];
+
     if (jobName) {
+        const formattedJobName = jobName.trim().toLowerCase();
         const jobRegexArray = jobName.trim().split(' ').map(word => {
             return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
         });
-        jobQuery = {$or: jobRegexArray}
+        const locationRegex = {city: {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+
+        jobQuery =  [...jobRegexArray, locationRegex];
     }
 
     try {
-        const users = await UserModel.find(jobQuery);
+        const users = await UserModel.find({}).or(jobQuery);
         return users.map(user => {
             user.password = undefined;
             return user;
