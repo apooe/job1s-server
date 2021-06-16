@@ -188,8 +188,21 @@ const sendCode = async (user) => {
 }
 const sendFormToUser = async (form) => {
 
-    let path = form.resume;
-    let filename = path.split("/").pop();
+    let att = [];
+
+    if(form.resume){
+
+        let path = form.resume;
+        let filename = path.split("/").pop();
+        att = [
+            {
+                filename: filename,
+                path: `../../code/ProjectHadassah/public/uploadsResume/${filename}`
+
+            }
+        ]
+    }
+
 
     const transporter = nodemailer.createTransport(smtpTransport({
         service: 'gmail',
@@ -211,20 +224,21 @@ const sendFormToUser = async (form) => {
         htmlContent += `<p><strong>Message:</strong> ${form.message}</p>`
     }
 
-    const mailOptions = {
+    let mailOptions = {
         from: 'jobonesecond@gmail.com',
         to: form.emailDest,
         subject: 'You received a message',
-        html: htmlContent,
-        attachments: [
-            {
-                filename: filename,
-                path: `../../code/ProjectHadassah/public/uploadsResume/${filename}`
+        html: htmlContent
 
-            }
-        ]
 
     };
+
+    if(form.resume){
+        mailOptions['attachements'] = att;
+
+    }
+
+    console.log(mailOptions)
 
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
