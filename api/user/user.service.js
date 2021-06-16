@@ -188,16 +188,18 @@ const sendCode = async (user) => {
 }
 const sendFormToUser = async (form) => {
 
+    console.log("form= ", form)
     let att = [];
 
     if(form.resume){
-
         let path = form.resume;
         let filename = path.split("/").pop();
+        const extension = path.split(".").pop();
+
         att = [
             {
-                filename: filename,
-                path: `../../code/ProjectHadassah/public/uploadsResume/${filename}`
+                filename: `resume.${extension}`,
+                path: `https://promoshop.s3.amazonaws.com/job1s/resumes/${filename}`
 
             }
         ]
@@ -229,16 +231,13 @@ const sendFormToUser = async (form) => {
         to: form.emailDest,
         subject: 'You received a message',
         html: htmlContent
-
-
     };
 
     if(form.resume){
-        mailOptions['attachements'] = att;
-
+        mailOptions['attachments'] = att;
     }
 
-    console.log(mailOptions)
+    console.log(mailOptions);
 
     await transporter.sendMail(mailOptions, function (error, info) {
         if (error) {

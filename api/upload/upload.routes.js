@@ -13,7 +13,7 @@ const awsStorage = new aws.S3({
 });
 
 function checkExtension(ext) {
-    return ['png', 'svg', 'jpg', 'jpeg', 'pdf'].includes(ext);
+    return ['png', 'svg', 'jpg', 'jpeg', 'pdf', 'docx'].includes(ext);
 }
 
 function getContentTypeByExtension(ext) {
@@ -27,6 +27,8 @@ function getContentTypeByExtension(ext) {
             return 'image/jpeg';
         case 'pdf':
             return 'application/pdf';
+        case 'docx':
+            return 'application/docx';
         default:
             return 'application/octet-stream';
     }

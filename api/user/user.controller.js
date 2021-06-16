@@ -106,7 +106,6 @@ const checkCodeReset = async(req, res, next) => {
 const sendFormToUser = async(req, res, next) => {
 
     try {
-        console.log(req.body);
         const form = req.body;
         await userService.sendFormToUser(form);
         return res.sendStatus(200);
