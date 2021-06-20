@@ -159,7 +159,7 @@ const sendCode = async (user) => {
         host: 'smtp.gmail.com',
         auth: {
             user: 'jobonesecond@gmail.com',
-            pass: 'job1second2021'
+            pass: 'job1sec2021'
         }
     }));
 
