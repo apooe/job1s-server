@@ -199,7 +199,7 @@ const sendFormToUser = async (form) => {
         att = [
             {
                 filename: `resume.${extension}`,
-                path: `https://promoshop.s3.amazonaws.com/job1s/resumes/${filename}`
+                path
 
             }
         ]
