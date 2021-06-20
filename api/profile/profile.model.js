@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 // Define the Database model
 const profileSchema = new mongoose.Schema({
 
-    userId: {type: mongoose.Schema.Types.ObjectId, required:true, unique: true},
+    userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required:true, unique: true},
     profileImg: {type: String},
     job: {type: String},
     description: {type: String},

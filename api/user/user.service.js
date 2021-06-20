@@ -1,5 +1,6 @@
 const UserModel = require('./user.model');
 const RecruiterModel = require('../recruiter/recruiter.model');
+const ProfileModel = require('../profile/profile.model');
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const config = require('../../config');
@@ -258,20 +259,32 @@ const uploadResume = async (query = {}) => {
 const searchProfiles = async (jobName) => {
 
     let jobQuery = [];
+    let queryProfiles = []
     if (jobName) {
         const formattedJobName = jobName.trim().toLowerCase();
         const jobRegexArray = formattedJobName.split(' ').map(word => {
-            return {job: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
+            return {relatedJobs: {$regex: `.*${word.trim()}.*`, $options: 'i'}}
         });
         const locationRegex = {city: {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const firstnameRegex = {firstname: {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const lastnameRegex = {lastname: {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
 
-        jobQuery =  [...jobRegexArray, locationRegex];
+        const collegeRegex = {'education.collegeName': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+        const degreeRegex = {'education.degree': {$regex: `.*${formattedJobName}.*`, $options: 'i'}};
+
+        jobQuery =  [...jobRegexArray, locationRegex, firstnameRegex, lastnameRegex] ;
+        queryProfiles = [collegeRegex, degreeRegex ];
     }
     try {
         const users = await UserModel.find({}).or(jobQuery);
-        console.log(users)
+        const userIds = new Set(users.map(u => u._id));
+        const profiles = await ProfileModel.find({}).or(queryProfiles).populate('userId');
+
+        if(profiles.length){
+            users.push(...profiles.filter( p => !userIds.has(p.userId?._id)).map(p => p.userId));
+        }
         return users.map(user => {
-            user.password = undefined;
+          user.password = undefined;
             return user;
         });
     } catch (e) {
