@@ -1,13 +1,12 @@
-const {Router} = require('express');
-const placeController = require('./place.controller');
+const { Router } = require("express");
+const placeController = require("./place.controller");
 
 const initPlacesRoutes = (globalRouter) => {
+  const placeRouter = new Router();
 
-    const placeRouter = new Router();
+  globalRouter.use("/place", placeRouter);
 
-    globalRouter.use('/place', placeRouter);
+  placeRouter.get("/", placeController.placeAutoComplete);
+};
 
-    placeRouter.get('/', placeController.placeAutoComplete);
-}
-
-module.exports = {initPlacesRoutes};
+module.exports = { initPlacesRoutes };
